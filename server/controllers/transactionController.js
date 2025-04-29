@@ -37,3 +37,28 @@ exports.getTransactions = async (req, res) => {
     res.status(500).json({ message: "Something went wrong", error: err.message });
   }
 };
+
+exports.deleteTransaction = async (req, res) => {
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  
+      const transaction = await Transaction.findById(req.params.id);
+  
+      if (!transaction) {
+        return res.status(404).json({ message: "Transaction not found" });
+      }
+  
+      // Check if the transaction belongs to the logged-in user
+      if (transaction.user.toString() !== decoded.id) {
+        return res.status(403).json({ message: "Unauthorized to delete this transaction" });
+      }
+  
+      await transaction.deleteOne();
+  
+      res.status(200).json({ message: "Transaction deleted successfully" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Something went wrong", error: err.message });
+    }
+  };
