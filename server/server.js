@@ -16,9 +16,13 @@ app.get("/", (req, res) => {
 
 // Import your auth routes
 const authRoutes = require("./routes/auth");
+// Import your transaction routes
+const transactionRoutes = require("./routes/transactions");
 
 // Use routes
 app.use("/api/auth", authRoutes);
+// Mount your transaction routes
+app.use("/api/transactions", transactionRoutes);
 
 // MongoDB Connection and Server Start
 const PORT = process.env.PORT || 5000;
