@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { registerUser } from "../services/authService";
+import { toast } from "react-toastify";
 
 function Register() {
   const navigate = useNavigate();
@@ -11,23 +13,14 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, email, password }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.message || "Registration failed");
-      }
-
-      navigate("/"); // after successful registration go back to Login
+      const data = await registerUser(username, email, password);
+      localStorage.setItem("token", data.token);
+      toast.success("🎉 Registered successfully");
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
       setError(err.message || "Registration failed");
+      toast.error("❌ " + (err.message || "Registration failed"));
     }
   };
 
@@ -75,7 +68,7 @@ function Register() {
             onChange={(e) => setPassword(e.target.value)}
             required
           /><br /><br />
-          <button type="submit">Sign Up</button>
+          <button type="submit">Register</button>
         </form>
         {error && <p style={{ color: "red" }}>{error}</p>}
         <p>
@@ -87,3 +80,4 @@ function Register() {
 }
 
 export default Register;
+
