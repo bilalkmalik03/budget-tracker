@@ -56,7 +56,7 @@ function Dashboard() {
       await addTransaction(token, {
         title,
         amount: Number(amount),
-        type,
+        type
       });
       toast.success("✅ Transaction added!");
       await fetchData();
