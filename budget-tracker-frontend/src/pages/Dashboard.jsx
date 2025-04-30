@@ -21,6 +21,11 @@ function Dashboard() {
       setBalance(bal);
     } catch (err) {
       console.error("Failed to load data", err);
+      if (err.message.includes("Invalid token")) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("token");
+        navigate("/");
+      }
     }
   };
 
@@ -48,18 +53,16 @@ function Dashboard() {
     console.log("📦 token being sent:", token); 
   
     try {
-      await addTransaction(token, {
-        title,
-        amount: Number(amount),
-        type,
-      });
+      await addTransaction(token, {...});
       toast.success("✅ Transaction added!");
-      setTitle("");
-      setAmount("");
-      setType("income");
       await fetchData();
     } catch (err) {
       console.error("Failed to add transaction", err);
+      if (err.message.includes("Invalid token")) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("token");
+        navigate("/");
+      }
     }
   };
   
@@ -77,8 +80,14 @@ function Dashboard() {
       await fetchData();
     } catch (err) {
       console.error("Failed to delete transaction", err);
+      if (err.message.includes("Invalid token")) {
+        toast.error("Session expired. Please log in again.");
+        localStorage.removeItem("token");
+        navigate("/");
+      }
     }
   };
+  
   return (
     <div
       style={{
