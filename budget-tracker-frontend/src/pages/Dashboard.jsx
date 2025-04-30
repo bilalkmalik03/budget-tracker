@@ -45,8 +45,14 @@ function Dashboard() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+    console.log("📦 token being sent:", token); 
+  
     try {
-      await addTransaction(token, { title, amount: Number(amount), type });
+      await addTransaction(token, {
+        title,
+        amount: Number(amount),
+        type,
+      });
       toast.success("✅ Transaction added!");
       setTitle("");
       setAmount("");
@@ -56,6 +62,7 @@ function Dashboard() {
       console.error("Failed to add transaction", err);
     }
   };
+  
 
   const handleLogout = () => {
     localStorage.removeItem("token");

@@ -6,7 +6,25 @@ require("dotenv").config(); // Load environment variables (.env file)
 const app = express();
 
 // Middlewares
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:5173", 
+  "https://budget-tracker-client.vercel.app" // your production domain
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // allow Postman, curl, etc.
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app") // allow Vercel preview URLs
+    ) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "DELETE", "PUT"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json());
 
 // Test route
