@@ -53,7 +53,11 @@ function Dashboard() {
     console.log("📦 token being sent:", token); 
   
     try {
-      await addTransaction(token, {...});
+      await addTransaction(token, {
+        title,
+        amount: Number(amount),
+        type,
+      });
       toast.success("✅ Transaction added!");
       await fetchData();
     } catch (err) {
@@ -87,7 +91,7 @@ function Dashboard() {
       }
     }
   };
-  
+
   return (
     <div
       style={{
