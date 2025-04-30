@@ -1,91 +1,66 @@
 const Transaction = require("../models/Transaction");
-const jwt = require("jsonwebtoken");
 
-exports.addTransaction = async (req, res) => {
+exports.createTransaction = async (req, res) => {
   try {
     const { title, amount, type } = req.body;
+    const userId = req.user?.id;
 
-    // Verify user from token
-    const token = req.headers.authorization?.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: no user ID found" });
+    }
 
-    const transaction = await Transaction.create({
-      user: decoded.id,
+    const newTx = await Transaction.create({
       title,
       amount,
       type,
+      user: userId,
     });
 
-    res.status(201).json(transaction);
+    res.status(201).json(newTx);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Something went wrong", error: err.message });
+    console.error("❌ Failed to create transaction:", err);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
 exports.getTransactions = async (req, res) => {
   try {
-    // Verify user from token
-    const token = req.headers.authorization?.split(" ")[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    const transactions = await Transaction.find({ user: decoded.id }).sort({ createdAt: -1 });
-
-    res.status(200).json(transactions);
+    const transactions = await Transaction.find({ user: req.user.id }).sort({ createdAt: -1 });
+    res.json(transactions);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Something went wrong", error: err.message });
+    console.error("❌ Failed to get transactions:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getBalance = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({ user: req.user.id });
+    const income = transactions
+      .filter((t) => t.type === "income")
+      .reduce((sum, t) => sum + t.amount, 0);
+    const expense = transactions
+      .filter((t) => t.type === "expense")
+      .reduce((sum, t) => sum + t.amount, 0);
+    res.json({ income, expense, total: income - expense });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to calculate balance" });
   }
 };
 
 exports.deleteTransaction = async (req, res) => {
-    try {
-      const token = req.headers.authorization?.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  
-      const transaction = await Transaction.findById(req.params.id);
-  
-      if (!transaction) {
-        return res.status(404).json({ message: "Transaction not found" });
-      }
-  
-      // Check if the transaction belongs to the logged-in user
-      if (transaction.user.toString() !== decoded.id) {
-        return res.status(403).json({ message: "Unauthorized to delete this transaction" });
-      }
-  
-      await transaction.deleteOne();
-  
-      res.status(200).json({ message: "Transaction deleted successfully" });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Something went wrong", error: err.message });
-    }
-  };
+  try {
+    const transaction = await Transaction.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user.id,
+    });
 
-  exports.getBalance = async (req, res) => {
-    try {
-      const token = req.headers.authorization?.split(" ")[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  
-      const transactions = await Transaction.find({ user: decoded.id });
-  
-      let income = 0;
-      let expense = 0;
-  
-      transactions.forEach((tx) => {
-        if (tx.type === "income") {
-          income += tx.amount;
-        } else if (tx.type === "expense") {
-          expense += tx.amount;
-        }
-      });
-  
-      const total = income - expense;
-  
-      res.status(200).json({ income, expense, total });
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ message: "Something went wrong", error: err.message });
+    if (!transaction) {
+      return res.status(404).json({ message: "Transaction not found" });
     }
-  };
+
+    res.json({ message: "Transaction deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to delete transaction" });
+  }
+};

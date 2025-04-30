@@ -1,9 +1,19 @@
 const express = require("express");
-const router = express.Router();
-const { addTransaction, getTransactions, deleteTransaction, getBalance } = require("../controllers/transactionController");
+const {
+  createTransaction,
+  getTransactions,
+  getBalance,
+  deleteTransaction,
+} = require("../controllers/transactionController");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-router.post("/", addTransaction);     // POST /api/transactions
-router.get("/", getTransactions);     // GET /api/transactions
-router.delete("/:id", deleteTransaction); 
+const router = express.Router();
+
+router.use(authMiddleware); // protect all routes
+
+router.post("/", createTransaction);
+router.get("/", getTransactions);
 router.get("/balance", getBalance);
+router.delete("/:id", deleteTransaction);
+
 module.exports = router;
