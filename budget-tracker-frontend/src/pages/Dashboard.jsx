@@ -158,19 +158,18 @@ function Dashboard() {
         <div style={{ flex: 1 }}>
           <h3>Transactions</h3>
           <ul>
-  {transactions.map((tx) => (
-    <li key={tx._id}>
-      <span className={`transaction-${tx.type}`}>
-        {tx.title} - ${tx.amount} ({tx.type})
-      </span>
-      <button
-        onClick={() => handleDelete(tx._id)}
-        style={{ marginLeft: "1rem" }}
-      >
-        Delete
-      </button>
-    </li>
-  ))}
+          {transactions.map((tx) => (
+  <li key={tx._id}>
+    <span className={`transaction-${tx.type}`}>
+      {tx.title} - ${tx.amount} ({tx.type})  
+      <br />
+      <small>{new Date(tx.createdAt).toLocaleDateString()}</small>
+    </span>
+    <button onClick={() => handleDelete(tx._id)} style={{ marginLeft: "1rem" }}>
+      Delete
+    </button>
+  </li>
+))}
 </ul>
         </div>
       </div>
