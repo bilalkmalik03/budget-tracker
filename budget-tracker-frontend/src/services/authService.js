@@ -26,10 +26,11 @@ export const loginUser = async (email, password) => {
     body: JSON.stringify({ email, password }),
   });
 
+  const data = await response.json();
+
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || "Login failed");
+    throw new Error(data.message || "Login failed");
   }
 
-  return await response.json();
+  return data.token; // just return the token string
 };
