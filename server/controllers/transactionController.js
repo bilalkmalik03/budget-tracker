@@ -2,7 +2,7 @@ const Transaction = require("../models/Transaction");
 
 exports.createTransaction = async (req, res) => {
   try {
-    const { title, amount, type } = req.body;
+    const { title, amount, type, date } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
@@ -14,6 +14,7 @@ exports.createTransaction = async (req, res) => {
       amount,
       type,
       user: userId,
+      date,
     });
 
     res.status(201).json(newTx);

@@ -9,7 +9,7 @@ function Dashboard() {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [type, setType] = useState("income");
-
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const navigate = useNavigate();
 
   const fetchData = async () => {
@@ -56,8 +56,9 @@ function Dashboard() {
       await addTransaction(token, {
         title,
         amount: Number(amount),
-        type
-      });
+        type,
+        date
+      })
       toast.success("✅ Transaction added!");
       await fetchData();
     } catch (err) {
@@ -146,6 +147,12 @@ function Dashboard() {
               onChange={(e) => setAmount(e.target.value)}
               required
             />
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+            />
             <select value={type} onChange={(e) => setType(e.target.value)}>
               <option value="income">Income</option>
               <option value="expense">Expense</option>
@@ -163,7 +170,7 @@ function Dashboard() {
     <span className={`transaction-${tx.type}`}>
       {tx.title} - ${tx.amount} ({tx.type})  
       <br />
-      <small>{new Date(tx.createdAt).toLocaleDateString()}</small>
+      <small>{new Date(tx.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</small>
     </span>
     <button onClick={() => handleDelete(tx._id)} style={{ marginLeft: "1rem" }}>
       Delete
