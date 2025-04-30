@@ -14,7 +14,7 @@ export const registerUser = async (username, email, password) => {
     throw new Error(errorData.message || "Registration failed");
   }
 
-  return await response.json(); // returns token, userId, username
+  return await response.json();
 };
 
 export const loginUser = async (email, password) => {
@@ -31,5 +31,5 @@ export const loginUser = async (email, password) => {
     throw new Error(errorData.message || "Login failed");
   }
 
-  return await response.json(); // returns token, userId, username
+  return await response.json();
 };
