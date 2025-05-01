@@ -15,6 +15,10 @@ const transactionSchema = new mongoose.Schema(
       enum: ["income", "expense"],
       required: [true, "Type must be income or expense"],
     },
+    date: {
+      type: Date,
+      default: Date.now,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
