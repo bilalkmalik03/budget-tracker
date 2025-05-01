@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getTransactions, getBalance, addTransaction, deleteTransaction } from "../services/transactionService";
 import { toast } from "react-toastify";
-
+import {BarChart,Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, } from "recharts";
 function Dashboard() {
   const [transactions, setTransactions] = useState([]);
   const [balance, setBalance] = useState({ income: 0, expense: 0, total: 0 });
@@ -92,7 +92,25 @@ function Dashboard() {
       }
     }
   };
-
+  
+  const getMonthlySummary = () => {
+    const summary = {};
+  
+    transactions.forEach((tx) => {
+      const date = new Date(tx.date);
+      const month = `${date.getFullYear()}-${(date.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}`; // e.g., "2025-04"
+  
+      if (!summary[month]) {
+        summary[month] = { month, income: 0, expense: 0 };
+      }
+  
+      summary[month][tx.type] += tx.amount;
+    });
+  
+    return Object.values(summary).sort((a, b) => a.month.localeCompare(b.month));
+  };
   return (
     <div
       style={{
@@ -163,6 +181,18 @@ function Dashboard() {
   
         {/* RIGHT PANEL */}
         <div style={{ flex: 1 }}>
+        <h3>Monthly Income vs Expense</h3>
+<ResponsiveContainer width="100%" height={300}>
+  <BarChart data={getMonthlySummary()} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+    <CartesianGrid strokeDasharray="3 3" />
+    <XAxis dataKey="month" />
+    <YAxis />
+    <Tooltip />
+    <Legend />
+    <Bar dataKey="income" fill="#82ca9d" />
+    <Bar dataKey="expense" fill="#ff6b6b" />
+  </BarChart>
+</ResponsiveContainer>
           <h3>Transactions</h3>
           <ul>
           {transactions.map((tx) => (
