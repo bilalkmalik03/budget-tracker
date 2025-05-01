@@ -117,6 +117,6 @@ npm run dev
 
 ## Author
 
-Created by [Your Name]  
-GitHub: [https://github.com/yourusername](https://github.com/gilalkmalik03)  
+Created by Bilal Malik 
+GitHub: [https://github.com/yourusername](https://github.com/bilalkmalik03)  
 LinkedIn: [(https://linkedin.com/in/yourusername](https://www.linkedin.com/in/bilal-malik-0022b2251/))
